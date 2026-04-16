@@ -1,22 +1,22 @@
 # Stellar Workshop (Soroban Smart Contracts)
 
-Repository ini berisi contoh dApps berbasis smart contract di jaringan Stellar (Soroban), ditulis dengan Rust.
+This repository contains sample decentralized applications (dApps) built on the Stellar Soroban smart contract platform using Rust.
 
-Saat ini ada 2 aplikasi berbeda dengan task yang berbeda:
+It currently includes two different applications with different tasks:
 
-1. **Notes Contract**: Menyimpan catatan sederhana (create, read, delete).
-2. **Polling Contract**: Membuat polling dan melakukan voting dengan validasi satu voter satu suara per polling.
+1. **Notes Contract**: Store simple notes (create, read, delete).
+2. **Polling Contract**: Create polls and vote with one-voter-one-vote validation per poll.
 
-## Tujuan Proyek
+## Project Goals
 
-Proyek ini dibuat untuk pembelajaran dasar pengembangan smart contract Soroban, dengan fokus pada:
+This project is designed for Soroban smart contract beginners and focuses on:
 
-- Cara menyimpan state di contract storage.
-- Cara membuat fungsi publik contract.
-- Cara menulis unit test untuk logic contract.
-- Cara menerapkan validasi sederhana (contoh: anti double vote).
+- Managing on-chain state in contract storage.
+- Building public contract functions.
+- Writing unit tests for contract logic.
+- Applying simple business validations (for example, preventing double voting).
 
-## Struktur Proyek
+## Project Structure
 
 ```text
 .
@@ -35,35 +35,35 @@ Proyek ini dibuat untuk pembelajaran dasar pengembangan smart contract Soroban, 
 └── README.md
 ```
 
-## Prasyarat
+## Prerequisites
 
 - Rust toolchain (stable)
 - Cargo
-- (Opsional) Soroban CLI untuk deploy dan invoke di network
+- (Optional) Soroban CLI for deployment and network invocation
 
-## Cara Menjalankan Test
+## Running Tests
 
-Jalankan dari root repository:
+Run from the repository root:
 
 ```bash
 cargo test -p notes
 cargo test -p polling
 ```
 
-## Dokumentasi Contract 1: Notes
+## Contract 1 Documentation: Notes
 
-Lokasi kode: `contracts/notes/src/lib.rs`
+Code location: `contracts/notes/src/lib.rs`
 
-### Ringkasan Fungsi
+### Notes Function Summary
 
 1. `create_note(title, content) -> String`
-  Menambahkan note baru, id dibuat incremental dari `NextId`.
+  Creates a new note with an incremental id from `NextId`.
 2. `get_notes() -> Vec<Note>`
-  Mengembalikan semua note dari storage.
+  Returns all notes from storage.
 3. `delete_note(id) -> String`
-  Menghapus note berdasarkan id, mengembalikan pesan sukses/gagal.
+  Deletes a note by id and returns a success or failure message.
 
-### Struktur Data
+### Notes Data Structure
 
 ```rust
 pub struct Note {
@@ -73,33 +73,33 @@ pub struct Note {
 }
 ```
 
-### Key Storage
+### Notes Storage Keys
 
-- `Notes`: daftar semua note.
-- `NextId`: id berikutnya untuk note baru.
+- `Notes`: list of all notes.
+- `NextId`: next id for new note creation.
 
-### Alur Logic Sederhana
+### Notes Logic Flow
 
-1. Baca list note dari storage.
-2. Untuk create: buat objek note baru, push ke list, simpan kembali.
-3. Untuk delete: loop list, cari id, remove jika ketemu, lalu simpan kembali.
+1. Read current note list from storage.
+2. For create: build a note object, push to list, and save back.
+3. For delete: iterate by id, remove when found, then save back.
 
-## Dokumentasi Contract 2: Polling
+## Contract 2 Documentation: Polling
 
-Lokasi kode: `contracts/polling/src/lib.rs`
+Code location: `contracts/polling/src/lib.rs`
 
-### Ringkasan Fungsi
+### Polling Function Summary
 
 1. `create_poll(question, option_a, option_b) -> u64`
-  Membuat polling baru dan mengembalikan `poll_id`.
+  Creates a new poll and returns `poll_id`.
 2. `get_polls() -> Vec<Poll>`
-  Mengembalikan semua polling yang tersedia.
+  Returns all available polls.
 3. `vote(poll_id, option, voter) -> String`
-  Menyimpan vote untuk polling tertentu.
+  Stores a vote for a specific poll.
 4. `get_result(poll_id) -> PollResult`
-  Menghitung total vote option A dan B untuk satu polling.
+  Calculates vote totals for option A and option B in one poll.
 
-### Struktur Data
+### Polling Data Structures
 
 ```rust
 pub struct Poll {
@@ -122,47 +122,45 @@ pub struct PollResult {
 }
 ```
 
-### Key Storage
+### Polling Storage Keys
 
-- `Polls`: daftar polling.
-- `Votes`: daftar suara.
-- `NextPollId`: id polling berikutnya.
+- `Polls`: list of polls.
+- `Votes`: list of all submitted votes.
+- `NextPollId`: next poll id.
 
-### Aturan Bisnis pada Voting
+### Voting Business Rules
 
 1. `voter.require_auth()`
-  Vote harus disetujui oleh address pemilih.
-2. Opsi vote hanya boleh `1` atau `2`.
-3. `poll_id` harus valid (poll harus ada).
-4. Satu voter tidak boleh vote dua kali di polling yang sama.
+  Vote submission must be authorized by the voter address.
+2. Vote option must be either `1` or `2`.
+3. `poll_id` must refer to an existing poll.
+4. A voter cannot vote twice in the same poll.
 
-## Unit Test yang Tersedia
+## Available Unit Tests
 
 ### Notes
 
-- Create note lalu get notes.
-- Delete note sukses.
-- Delete note saat id tidak ditemukan.
+- Create a note and fetch notes.
+- Delete note success case.
+- Delete note when id is not found.
 
 ### Polling
 
-- Create poll lalu get polls.
-- Vote valid dan hitung hasil.
-- Cegah double vote.
-- Tolak opsi vote tidak valid.
+- Create poll and fetch polls.
+- Submit valid votes and calculate results.
+- Prevent double vote.
+- Reject invalid vote option.
 
-## Pengembangan Lanjutan (Opsional)
+## Next Development Ideas (Optional)
 
-Ide task berikutnya:
-
-1. **Notes**: update_note, ownership per address.
-2. **Polling**: close poll, deadline voting, role admin.
-3. Integrasi frontend untuk invoke contract dari wallet.
+1. **Notes**: add `update_note`, add per-address ownership.
+2. **Polling**: add poll closing, voting deadline, admin role.
+3. Add frontend integration for wallet-based contract invocation.
 
 ---
 
-Jika kamu baru mulai belajar Soroban, urutan terbaik adalah:
+If you are new to Soroban, the recommended learning order is:
 
-1. Pahami kontrak Notes (state paling sederhana).
-2. Lanjut ke Polling (validasi + auth + agregasi hasil).
-3. Tambahkan fitur sedikit demi sedikit dan uji dengan unit test.
+1. Start with the Notes contract (simplest state management).
+2. Continue with Polling (auth, validation, and result aggregation).
+3. Add features incrementally and validate behavior with unit tests.
